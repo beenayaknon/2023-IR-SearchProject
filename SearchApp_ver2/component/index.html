@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            font-family: Calibri, sans-serif;
+            font-family: sans-serif;
             margin: 20px;
             background-color: #0C0C0C;
             color: #C2C2C2;
             text-align: center;
         }
 
+        #search-container {
+            display: flex;
+            align-items: center;
+            max-width: 50%;
+            margin: 0 auto;
+        }
+
         #search-input {
-            width: 300px;
-            padding-left: 24px;
-            padding-right: 24px;
-            padding-top: 10px;
-            padding-bottom: 10px;
+            width: 100%;
+            padding: 10px;
             font-size: 16px;
             background-color: #FAFAFA;
             border-radius: 30px;
-            max-width: 50%;
             outline: none;
             border: none;
-            
-        }
-
-        #search-btn {
-            padding: 8px;
-            font-size: 16px;
-            cursor: pointer;
+            margin-right: 10px;
+            padding-left: 30px;
+            margin-top: 15px;
         }
 
         #results {
-            margin-top: 20px;
             text-align: left;
         }
 
@@ -47,7 +47,6 @@
             background-color: #171717;
         }
 
-
         .result-image {
             max-width: 426px;
             max-height: 240px;
@@ -56,93 +55,170 @@
         }
 
         .result-content {
+            display: flex;
+            flex-direction: column;
             flex-grow: 1;
         }
 
+        h3,
         p {
             margin: 0;
             font-weight: lighter;
-            font-size: 16px;
         }
-        h3{
+
+        h3 {
             font-weight: lighter;
             color: #4F4F4F;
             font-size: 16px;
         }
-        p{
-            font-weight: lighter;
-            font-size: 16px;
-        }
-        h6{
+
+        h6 {
             font-size: 20px;
             font-weight: lighter;
             margin-top: 0;
             margin-bottom: 20px;
         }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 0%;
+        }
+
+        h5 {
+            font-size: 16px;
+            font-weight: lighter;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .half-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .half-container>div {
+            width: 48%;
+        }
+
+        #search-btn {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #FAFAFA;
+            color: #0C0C0C;
+            border: none;
+            border-radius: 30px;
+            margin-top: 15px;
+        }
+
+        #search-btn i {
+            color: #0C0C0C;
+        }
+
+        #result-container {
+            width: 80%;
+            margin: 0 auto;
+            text-align: left;
+            margin-top: 3%;
+        }
     </style>
 </head>
+
 <body>
     <h1>Game Search</h1>
-    <h6>BBP Ultimate Sugoi Universe Best Game Search</h6>
-    <input type="text" id="search-input" placeholder="Enter your search query">
-    <button id="search-btn" onclick="search()">Search</button>
+    <h5>BBP Ultimate Sugoi Universe Best Search System For Games</h5>
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Enter your search query">
+        <button id="search-btn" onclick="search()">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+    <div id="result-container">
+        <div id="results">
+            <script>
+                async function search() {
+                    const query = document.getElementById('search-input').value;
 
-    <div id="results"></div>
+                    if (!query) {
+                        alert('Please enter a search query.');
+                        return;
+                    }
 
-    <script>
-        async function search() {
-            const query = document.getElementById('search-input').value;
+                    try {
+                        const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                        const data = await response.json();
 
-            if (!query) {
-                alert('Please enter a search query.');
-                return;
-            }
+                        displayResults(data.results);
+                    } catch (error) {
+                        console.error('Error during search:', error);
+                    }
+                }
 
-            try {
-                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
+                function displayResults(results) {
+                    const resultsContainer = document.getElementById('results');
+                    resultsContainer.innerHTML = '';
 
-                displayResults(data.results);
-            } catch (error) {
-                console.error('Error during search:', error);
-            }
-        }
+                    if (results.length === 0) {
+                        const noResultsMessage = document.createElement('h6');
+                        noResultsMessage.textContent = 'No results found';
+                        resultsContainer.appendChild(noResultsMessage);
+                        return;
+                    }
 
-        function displayResults(results) {
-            const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = '';
+                    const resultList = document.createElement('ul');
 
-            if (results.length === 0) {
-                resultsContainer.innerHTML = 'No results found.';
-                return;
-            }
+                    const foundItemsHeader = document.createElement('h6');
+                    foundItemsHeader.textContent = `Found ${results.length} items`;
+                    resultsContainer.appendChild(foundItemsHeader);
 
-            const resultList = document.createElement('ul');
-
-            results.forEach(result => {
-                const listItem = document.createElement('li');
-                listItem.className = 'result-item'; // Add the result-item class
-                listItem.innerHTML = `
-                    <img class="result-image" src="${result.background_image}" alt="Game Image">
+                    results.forEach(result => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'result-item';
+                        listItem.innerHTML = `
+                <img class="result-image" src="${result.background_image || '/no_img.jpg'}" alt="Game Image">
                     <div class="result-content">
                         <h2>${result.name_original}</h2>
-                        <h3>Genre</h3>
-                        <p>${getNames(result.genres)}</p><br>
-                        <h3>Tags</h3>
-                        <p>${getNames(result.tags)}</p><br>
+                        <div class="half-container">
+                            <div>
+                                <h3>Genre</h3>
+                                <p>${getNames(result.genres) || '-'}</p>
+                            </div>
+                            <div>
+                                <h3>Tags</h3>
+                                <p>${getNames(result.tags) || '-'}</p>
+                            </div>
+                        </div>
+                        <div class="half-container">
+                            <div>
+                                <h3>Developers</h3>
+                                <p>${getNames(result.developers) || '-'}</p>
+                            </div>
+                            <div>
+                                <h3>Publisher</h3>
+                                <p>${getNames(result.publishers) || '-'}</p>
+                            </div>
+                        </div>
+                        <br>
                         <h3>Description</h3>
-                        <p>${result.description}</p>
+                        <p>${result.description || '-'}</p>
                     </div>
                 `;
-                resultList.appendChild(listItem);
-            });
+                        resultList.appendChild(listItem);
+                    });
 
-            resultsContainer.appendChild(resultList);
-        }
+                    resultsContainer.appendChild(resultList);
+                }
 
-        function getNames(array) {
-            return array.map(item => item.name).join(', ');
-        }
-    </script>
+                function getNames(array) {
+                    return array ? array.map(item => item.name).join(', ') : null;
+                }
+            </script>
+        </div>
+    </div>
 </body>
+
 </html>
