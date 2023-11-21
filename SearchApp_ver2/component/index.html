@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Search</title>
+    <style>
+        body {
+            font-family: Calibri, sans-serif;
+            margin: 20px;
+            background-color: #0C0C0C;
+            color: #C2C2C2;
+            text-align: center;
+        }
+
+        #search-input {
+            width: 300px;
+            padding-left: 24px;
+            padding-right: 24px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            font-size: 16px;
+            background-color: #FAFAFA;
+            border-radius: 30px;
+            max-width: 50%;
+            outline: none;
+            border: none;
+            
+        }
+
+        #search-btn {
+            padding: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #171717;
+        }
+
+
+        .result-image {
+            max-width: 426px;
+            max-height: 240px;
+            border-radius: 15px;
+            margin-right: 20px;
+        }
+
+        .result-content {
+            flex-grow: 1;
+        }
+
+        p {
+            margin: 0;
+            font-weight: lighter;
+            font-size: 16px;
+        }
+        h3{
+            font-weight: lighter;
+            color: #4F4F4F;
+            font-size: 16px;
+        }
+        p{
+            font-weight: lighter;
+            font-size: 16px;
+        }
+        h6{
+            font-size: 20px;
+            font-weight: lighter;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Search</h1>
+    <h6>BBP Ultimate Sugoi Universe Best Game Search</h6>
+    <input type="text" id="search-input" placeholder="Enter your search query">
+    <button id="search-btn" onclick="search()">Search</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function search() {
+            const query = document.getElementById('search-input').value;
+
+            if (!query) {
+                alert('Please enter a search query.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                displayResults(data.results);
+            } catch (error) {
+                console.error('Error during search:', error);
+            }
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = 'No results found.';
+                return;
+            }
+
+            const resultList = document.createElement('ul');
+
+            results.forEach(result => {
+                const listItem = document.createElement('li');
+                listItem.className = 'result-item'; // Add the result-item class
+                listItem.innerHTML = `
+                    <img class="result-image" src="${result.background_image}" alt="Game Image">
+                    <div class="result-content">
+                        <h2>${result.name_original}</h2>
+                        <h3>Genre</h3>
+                        <p>${getNames(result.genres)}</p><br>
+                        <h3>Tags</h3>
+                        <p>${getNames(result.tags)}</p><br>
+                        <h3>Description</h3>
+                        <p>${result.description}</p>
+                    </div>
+                `;
+                resultList.appendChild(listItem);
+            });
+
+            resultsContainer.appendChild(resultList);
+        }
+
+        function getNames(array) {
+            return array.map(item => item.name).join(', ');
+        }
+    </script>
+</body>
+</html>
