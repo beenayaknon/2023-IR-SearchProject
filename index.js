@@ -60,7 +60,7 @@ const startServer = async () => {
                                     {
                                         multi_match: {
                                             query: q,
-                                            fields: ['tags.name'],
+                                            fields: ['tags'],
                                             boost: 1.5,
                                         },
                                     },
