@@ -39,6 +39,7 @@ const startServer = async () => {
             try {
                 const result = await client.search({
                     index: indexName,
+                    size: 100,
                     body: {
                         query: {
                             bool: {
@@ -47,21 +48,21 @@ const startServer = async () => {
                                         multi_match: {
                                             query: q,
                                             fields: ['name_original'],
+                                            boost: 5,
+                                        },
+                                    },
+                                    {
+                                        multi_match: {
+                                            query: q,
+                                            fields: ['genres.name'],
                                             boost: 3,
                                         },
                                     },
                                     {
                                         multi_match: {
                                             query: q,
-                                            fields: ['genres'],
-                                            boost: 2,
-                                        },
-                                    },
-                                    {
-                                        multi_match: {
-                                            query: q,
-                                            fields: ['tags'],
-                                            boost: 1.5,
+                                            fields: ['tags.name'],
+                                            boost: 1,
                                         },
                                     },
                                     {
